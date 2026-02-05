@@ -8,7 +8,10 @@
     "compile": "hardhat compile",
     "deploy:local": "hardhat run scripts/deploy.js --network localhost",
     "node": "hardhat node",
-    "clean": "hardhat clean"
+    "clean": "hardhat clean",
+    "build": "echo 'Static site - no build needed'",
+    "dev": "npx serve public",
+    "start": "npx serve public"
   },
   "repository": {
     "type": "git",

@@ -92,6 +92,22 @@ The demo simulates the blockchain functionality without requiring a Web3 wallet:
 - Navigate through Chapter 1 of the story
 - Multiple paths lead to different outcomes
 
+## 🌐 Deploy to Vercel
+
+Deploy the game to Vercel with one click:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bersezk/bersgame)
+
+Or follow the [detailed deployment guide](VERCEL_DEPLOYMENT.md) for step-by-step instructions.
+
+**Quick Deploy Steps:**
+1. Push to GitHub (already done)
+2. Import project in Vercel
+3. Set output directory to `public`
+4. Deploy!
+
+Your game will be live on a global CDN with automatic HTTPS.
+
 ## 🔗 Blockchain Deployment
 
 ### Local Development
