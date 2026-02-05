@@ -7,6 +7,14 @@ This guide will help you deploy the BersGame visual novel to Vercel.
 - A [Vercel account](https://vercel.com/signup) (free tier works perfectly)
 - Git repository connected to GitHub (already done)
 
+## Important: Configuration
+
+The project is configured as a **static site** with no build step required. The `vercel.json` file explicitly sets:
+- `framework: null` - No framework auto-detection
+- `buildCommand: null` - No build command needed
+- `outputDirectory: "public"` - Serves files from public directory
+- `vercel-build` script in package.json overrides any default build behavior
+
 ## Quick Deploy
 
 ### Option 1: Deploy via Vercel Dashboard
@@ -15,10 +23,10 @@ This guide will help you deploy the BersGame visual novel to Vercel.
 2. Click "Add New" → "Project"
 3. Import your GitHub repository: `bersezk/bersgame`
 4. Configure project settings:
-   - **Framework Preset**: Other
+   - **Framework Preset**: Other (or leave auto-detected - config will override)
    - **Root Directory**: `./` (leave as default)
-   - **Build Command**: Leave empty or use `echo 'No build needed'`
-   - **Output Directory**: `public`
+   - **Build Command**: Will be automatically handled by vercel.json
+   - **Output Directory**: `public` (set in vercel.json)
 5. Click "Deploy"
 6. Your site will be live at `https://your-project.vercel.app`
 
@@ -44,7 +52,7 @@ vercel
    - Which scope? Select your account
    - Link to existing project? **N** (first time)
    - What's your project's name? **bersgame**
-   - In which directory is your code located? **./public**
+   - In which directory is your code located? **./** (project root, not ./public)
 
 5. For production deployment:
 ```bash
@@ -132,8 +140,11 @@ Check your deployment status:
 
 ## Troubleshooting
 
+### Issue: Vercel tries to use Next.js build
+**Solution**: This is now fixed. The `vercel.json` file explicitly sets `framework: null` and `buildCommand: null` to prevent auto-detection. The `vercel-build` script in `package.json` also overrides any default build behavior.
+
 ### Issue: Build fails
-**Solution**: The project is a static site and doesn't need a build step. Ensure build command is empty or set to a simple echo command.
+**Solution**: The project is a static site and doesn't need a build step. The configuration now properly tells Vercel this is a static site with no build required.
 
 ### Issue: 404 errors
 **Solution**: Check that `vercel.json` has the correct rewrite rules and `outputDirectory` is set to `public`.

@@ -10,6 +10,7 @@
     "node": "hardhat node",
     "clean": "hardhat clean",
     "build": "echo 'Static site - no build needed'",
+    "vercel-build": "echo 'Static site - no build needed'",
     "dev": "npx serve public",
     "start": "npx serve public"
   },

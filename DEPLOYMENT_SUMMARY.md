@@ -4,14 +4,19 @@
 
 BersGame is now **fully configured** for Vercel deployment! 🎉
 
+**Latest Update**: Fixed framework auto-detection issue to prevent Vercel from trying to use Next.js build.
+
 ## What Was Added
 
 ### 1. Core Configuration Files
 
 - **`vercel.json`** - Main Vercel configuration
+  - Explicitly sets `framework: null` to prevent auto-detection
+  - Sets `buildCommand: null` (no build needed)
   - Static site serving from `public` directory
   - SPA routing configuration
   - Security headers (CSP, XSS protection)
+  - `installCommand` to skip unnecessary dependency installation
 
 - **`.vercelignore`** - Deployment optimization
   - Excludes development files
@@ -22,7 +27,7 @@ BersGame is now **fully configured** for Vercel deployment! 🎉
 
 - **`VERCEL_DEPLOYMENT.md`** - Complete deployment guide
   - Three deployment methods (Dashboard, CLI, One-Click)
-  - Troubleshooting section
+  - Troubleshooting section (including Next.js auto-detection fix)
   - Custom domain setup
   - Environment variables guide
 
@@ -35,6 +40,7 @@ BersGame is now **fully configured** for Vercel deployment! 🎉
 
 - **Updated `package.json`**
   - `npm run build` - No-op for static site
+  - `npm run vercel-build` - Overrides Vercel's default build behavior
   - `npm run dev` - Local development server
   - `npm run start` - Production-like serving
 
