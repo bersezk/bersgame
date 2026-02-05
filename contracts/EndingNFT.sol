@@ -12,6 +12,8 @@ contract EndingNFT is ERC721, ERC721URIStorage, Ownable {
     mapping(uint256 => string) private _endingURIs;
     
     // Mapping from player address to their minted endings
+    // Note: This tracks which endings a player has achieved/minted, not current ownership
+    // The array is not updated if NFTs are transferred to preserve achievement history
     mapping(address => uint256[]) private _playerEndings;
     
     // Mapping to check if player already minted a specific ending
@@ -51,7 +53,8 @@ contract EndingNFT is ERC721, ERC721URIStorage, Ownable {
     }
     
     /**
-     * @dev Returns all token IDs owned by a player
+     * @dev Returns all token IDs minted by a player
+     * Note: Returns endings achieved by player, not current ownership
      * @param player The address of the player
      */
     function getPlayerEndings(address player) external view returns (uint256[] memory) {

@@ -35,7 +35,9 @@ describe("EndingNFT", function () {
   describe("Setting Ending URIs", function () {
     it("Should allow owner to set ending URI", async function () {
       await endingNFT.setEndingURI(4, "ipfs://ending4");
-      // URI is set successfully if we can mint with it
+      // Verify by successfully minting with the new ending
+      await endingNFT.connect(player1).mintEnding(4);
+      expect(await endingNFT.balanceOf(player1.address)).to.equal(1);
     });
 
     it("Should not allow non-owner to set ending URI", async function () {
@@ -84,6 +86,8 @@ describe("EndingNFT", function () {
       
       const endings = await endingNFT.getPlayerEndings(player1.address);
       expect(endings.length).to.equal(2);
+      expect(endings[0]).to.equal(0); // First token ID
+      expect(endings[1]).to.equal(1); // Second token ID
     });
 
     it("Should check if player minted specific ending", async function () {
