@@ -1,6 +1,47 @@
 # Vercel Deployment Fix
 
-## Issue
+## Latest Issue: 404 NOT_FOUND Error
+
+When accessing the deployed Vercel site, it was returning:
+```
+404: NOT_FOUND
+Code: NOT_FOUND
+ID: sin1::jbc8x-1770300115624-5391cdd1aee4
+```
+
+### Root Cause
+The previous `vercel.json` configuration wasn't properly routing requests to the static files in the `public/` directory. Vercel needs explicit build and route configuration for static sites served from subdirectories.
+
+### Solution
+Updated `vercel.json` to use Vercel's v2 configuration format with proper builds and routes:
+
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ]
+}
+```
+
+**Key changes:**
+- Added `"version": 2` to use stable Vercel configuration format
+- Added `builds` section with `@vercel/static` builder for the public directory
+- Added `routes` to map all requests to files in the `/public/` directory
+- Simplified configuration by removing unnecessary options
+
+---
+
+## Previous Issue: Framework Auto-Detection
 
 When deploying to Vercel, the build was failing with:
 
@@ -10,15 +51,15 @@ If you need to define a different build step, please create a
 `vercel-build` script in your `package.json`
 ```
 
-## Root Cause
+### Root Cause (Previous)
 
 Vercel was auto-detecting the project as a Next.js application and trying to run `next build`, even though this is a static HTML site with no build process required.
 
-## Solution
+### Solution (Previous)
 
 We made the following changes to explicitly tell Vercel this is a static site:
 
-### 1. Updated `vercel.json`
+### 1. Updated `vercel.json` (Previous Attempt)
 
 ```json
 {
