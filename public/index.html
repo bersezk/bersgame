@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BersGame - Blockchain Visual Novel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .status-bar {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .token-count {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .token-icon {
+            width: 30px;
+            height: 30px;
+            background: #f39c12;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .game-screen {
+            padding: 40px;
+            min-height: 400px;
+        }
+
+        .scene-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            font-size: 60px;
+        }
+
+        .scene-text {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .character-name {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-button {
+            background: #3498db;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .choice-button:hover:not(:disabled) {
+            background: #2980b9;
+            transform: translateX(5px);
+        }
+
+        .choice-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .token-cost {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .start-screen h1 {
+            font-size: 48px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .start-button {
+            background: #e74c3c;
+            color: white;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .start-button:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .game-over h2 {
+            font-size: 36px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        .message-box {
+            background: #fff3cd;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .transaction-log {
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        .chapter-indicator {
+            font-size: 14px;
+            color: #95a5a6;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="status-bar">
+            <div class="chapter-indicator" id="chapterIndicator">Chapter 1 - The Beginning</div>
+            <div class="token-count">
+                <div class="token-icon">🪙</div>
+                <span id="tokenCount">100</span> BERS
+            </div>
+        </div>
+
+        <div id="startScreen" class="game-screen start-screen">
+            <h1>🎭 BersGame</h1>
+            <p>Welcome to BersGame, a blockchain-powered visual novel where every decision matters.</p>
+            <p>You start with <strong>100 BERS tokens</strong>. Each decision you make will cost <strong>10 BERS tokens</strong>, which will be burned forever.</p>
+            <p>Choose wisely, as your tokens are limited and irreplaceable!</p>
+            <button class="start-button" onclick="startGame()">Start Adventure</button>
+        </div>
+
+        <div id="gameScreen" class="game-screen hidden">
+            <div class="scene-image" id="sceneImage">🏰</div>
+            <div class="character-name" id="characterName"></div>
+            <div class="scene-text" id="sceneText"></div>
+            <div class="choices" id="choices"></div>
+            <div class="transaction-log" id="transactionLog"></div>
+        </div>
+
+        <div id="gameOverScreen" class="game-screen game-over hidden">
+            <h2 id="gameOverTitle">Game Over</h2>
+            <p id="gameOverMessage"></p>
+            <button class="start-button" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            tokens: 100,
+            currentChapter: 1,
+            currentScene: 0,
+            decisions: [],
+            decisionCost: 10
+        };
+
+        const story = {
+            1: {
+                title: "Chapter 1 - The Beginning",
+                scenes: [
+                    {
+                        image: "🏰",
+                        character: "Narrator",
+                        text: "You stand before the ancient castle of Berserion. Legend says that a powerful artifact lies within, capable of granting immense power. Two paths lie before you.",
+                        choices: [
+                            {
+                                text: "Take the main gate - Bold and direct approach",
+                                nextScene: 1
+                            },
+                            {
+                                text: "Find a secret entrance - Cautious and stealthy",
+                                nextScene: 2
+                            }
+                        ]
+                    },
+                    {
+                        image: "⚔️",
+                        character: "Guard Captain",
+                        text: "Halt! You dare approach the main gate? The guards eye you suspiciously. You notice their armor is old but well-maintained.",
+                        choices: [
+                            {
+                                text: "Challenge them to a duel for passage",
+                                nextScene: 3
+                            },
+                            {
+                                text: "Try to bribe them with promises of treasure",
+                                nextScene: 4
+                            }
+                        ]
+                    },
+                    {
+                        image: "🗝️",
+                        character: "Mysterious Voice",
+                        text: "You discover a hidden passage covered in moss. Inside, strange symbols glow faintly. A voice whispers: 'Only the worthy may pass...'",
+                        choices: [
+                            {
+                                text: "Decipher the symbols using ancient knowledge",
+                                nextScene: 5
+                            },
+                            {
+                                text: "Ignore the warning and proceed",
+                                nextScene: 6
+                            }
+                        ]
+                    },
+                    {
+                        image: "⚔️",
+                        character: "Guard Captain",
+                        text: "You fight valiantly! After an intense battle, the guards acknowledge your strength and step aside. 'You have earned passage, warrior.'",
+                        choices: [
+                            {
+                                text: "Thank them and enter the castle",
+                                nextScene: 7,
+                                final: true
+                            }
+                        ]
+                    },
+                    {
+                        image: "💰",
+                        character: "Guard Captain",
+                        text: "The guards laugh at your offer. 'We have no need for gold. Leave now, or face our steel!'",
+                        choices: [
+                            {
+                                text: "Fight them anyway",
+                                nextScene: 3
+                            },
+                            {
+                                text: "Retreat and find another way",
+                                nextScene: 2
+                            }
+                        ]
+                    },
+                    {
+                        image: "✨",
+                        character: "Ancient Guardian",
+                        text: "The symbols react to your wisdom! A portal opens, revealing a shortcut to the throne room. You have proven yourself worthy.",
+                        choices: [
+                            {
+                                text: "Step through the portal",
+                                nextScene: 7,
+                                final: true
+                            }
+                        ]
+                    },
+                    {
+                        image: "💀",
+                        character: "Ancient Trap",
+                        text: "The passage collapses! You barely escape with your life. Your ignorance has cost you precious time.",
+                        choices: [
+                            {
+                                text: "Try the main gate instead",
+                                nextScene: 1
+                            }
+                        ]
+                    },
+                    {
+                        image: "👑",
+                        character: "Narrator",
+                        text: "You have reached the throne room! The artifact gleams before you. Congratulations, brave adventurer. Your journey has just begun...",
+                        choices: [
+                            {
+                                text: "End Chapter 1",
+                                nextScene: "end"
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            loadScene(1, 0);
+        }
+
+        function loadScene(chapter, sceneIndex) {
+            const scene = story[chapter].scenes[sceneIndex];
+            gameState.currentChapter = chapter;
+            gameState.currentScene = sceneIndex;
+
+            document.getElementById('chapterIndicator').textContent = story[chapter].title;
+            document.getElementById('sceneImage').textContent = scene.image;
+            document.getElementById('characterName').textContent = scene.character;
+            document.getElementById('sceneText').textContent = scene.text;
+
+            const choicesContainer = document.getElementById('choices');
+            choicesContainer.innerHTML = '';
+
+            scene.choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice-button';
+                
+                if (choice.nextScene === "end") {
+                    button.innerHTML = `
+                        <span>${choice.text}</span>
+                        <span class="token-cost">Free</span>
+                    `;
+                    button.onclick = () => endGame(true);
+                } else {
+                    button.innerHTML = `
+                        <span>${choice.text}</span>
+                        <span class="token-cost">🔥 ${gameState.decisionCost} BERS</span>
+                    `;
+                    
+                    if (gameState.tokens < gameState.decisionCost) {
+                        button.disabled = true;
+                        button.innerHTML = `
+                            <span>${choice.text}</span>
+                            <span class="token-cost">❌ Insufficient tokens</span>
+                        `;
+                    } else {
+                        button.onclick = () => makeDecision(chapter, choice.nextScene, choice.text);
+                    }
+                }
+                
+                choicesContainer.appendChild(button);
+            });
+
+            document.getElementById('transactionLog').textContent = 
+                `Scene ${sceneIndex + 1} | Decisions Made: ${gameState.decisions.length} | Tokens Burned: ${gameState.decisions.length * gameState.decisionCost}`;
+        }
+
+        function makeDecision(chapter, nextScene, choiceText) {
+            // Burn tokens
+            gameState.tokens -= gameState.decisionCost;
+            gameState.decisions.push({
+                chapter: chapter,
+                scene: gameState.currentScene,
+                choice: choiceText,
+                tokensBurned: gameState.decisionCost,
+                timestamp: new Date().toISOString()
+            });
+
+            // Update token display with animation
+            const tokenElement = document.getElementById('tokenCount');
+            tokenElement.style.transition = 'all 0.3s';
+            tokenElement.style.transform = 'scale(1.2)';
+            tokenElement.style.color = '#e74c3c';
+            
+            setTimeout(() => {
+                tokenElement.textContent = gameState.tokens;
+                tokenElement.style.transform = 'scale(1)';
+                tokenElement.style.color = 'white';
+            }, 300);
+
+            // Check if player ran out of tokens
+            if (gameState.tokens < gameState.decisionCost && !isAtFinalScene(chapter, nextScene)) {
+                setTimeout(() => endGame(false), 1000);
+            } else {
+                // Load next scene after a brief delay
+                setTimeout(() => loadScene(chapter, nextScene), 500);
+            }
+        }
+
+        function isAtFinalScene(chapter, sceneIndex) {
+            const scene = story[chapter].scenes[sceneIndex];
+            return scene.choices.some(choice => choice.nextScene === "end");
+        }
+
+        function endGame(success) {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+
+            const title = document.getElementById('gameOverTitle');
+            const message = document.getElementById('gameOverMessage');
+
+            if (success) {
+                title.textContent = "🎉 Chapter Complete!";
+                title.style.color = '#27ae60';
+                message.innerHTML = `
+                    <p style="font-size: 18px; margin-bottom: 20px;">Congratulations! You have completed Chapter 1 of BersGame.</p>
+                    <div class="message-box">
+                        <strong>Your Stats:</strong><br>
+                        Decisions Made: ${gameState.decisions.length}<br>
+                        Tokens Burned: ${gameState.decisions.length * gameState.decisionCost} BERS<br>
+                        Tokens Remaining: ${gameState.tokens} BERS
+                    </div>
+                    <p style="margin-top: 20px; color: #7f8c8d;">More chapters coming soon...</p>
+                `;
+            } else {
+                title.textContent = "💔 Out of Tokens!";
+                title.style.color = '#e74c3c';
+                message.innerHTML = `
+                    <p style="font-size: 18px; margin-bottom: 20px;">You have run out of BERS tokens and cannot continue your adventure.</p>
+                    <div class="message-box">
+                        <strong>Your Journey:</strong><br>
+                        Decisions Made: ${gameState.decisions.length}<br>
+                        Tokens Burned: ${gameState.decisions.length * gameState.decisionCost} BERS<br>
+                        Final Balance: ${gameState.tokens} BERS
+                    </div>
+                    <p style="margin-top: 20px; color: #7f8c8d;">In the real blockchain version, you would need to acquire more tokens to continue.</p>
+                `;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('BersGame - Blockchain Visual Novel Loaded');
+            console.log('Game State:', gameState);
+        });
+    </script>
+</body>
+</html>
